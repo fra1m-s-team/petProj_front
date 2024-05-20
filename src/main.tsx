@@ -1,3 +1,6 @@
+import { MantineProvider } from '@mantine/core';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
 import {
 	Scene,
 	PerspectiveCamera,
@@ -9,6 +12,7 @@ import {
 } from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+import LoginPage from './auth';
 
 // FIXME: Вынести все в папку scripts
 // Создание сцены
@@ -76,14 +80,11 @@ document.body.appendChild(rendever.domElement);
 // });
 
 // ReactDOM.createRoot(document.getElementById('root')!).render(
-// 	<React.StrictMode>
-// 		<MantineProvider withCssVariables theme={theme}>
-// 			<Container size='sm' style={{ marginTop: '50px' }}>
-// 				{/* <App /> */}
-// 			</Container>
-// 		</MantineProvider>
-// 	</React.StrictMode>
+// 	<MantineProvider>
+// 		<LoginPage />
+// 	</MantineProvider>
 // );
+
 
 const animate = () => {
 	requestAnimationFrame(animate);
