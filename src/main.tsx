@@ -79,11 +79,12 @@ document.body.appendChild(rendever.domElement);
 // 	// Другие свойства темы...
 // });
 
-// ReactDOM.createRoot(document.getElementById('root')!).render(
-// 	<MantineProvider>
-// 		<LoginPage />
-// 	</MantineProvider>
-// );
+ReactDOM.createRoot(document.getElementById('root')!).render(
+	<MantineProvider>
+		<LoginPage />
+	</MantineProvider>
+);
+
 
 
 const animate = () => {
