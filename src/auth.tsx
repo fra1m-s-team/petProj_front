@@ -30,8 +30,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 	};
 
 	return (
-		<Container size='xs'>
-			<Title style={{ textAlign: 'center' }} mt='lg'>
+		<form onSubmit={handleSubmit} className='login_form'>
+			<Title>
 				Login
 			</Title>
 			{error && (
@@ -39,15 +39,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 					{error}
 				</Alert>
 			)}
-			<form onSubmit={handleSubmit}>
-				<TextInput
-					label='Username'
-					placeholder='Your username'
-					value={username}
-					onChange={e => setUsername(e.currentTarget.value)}
-					required
-					mt='md'
-				/>
+			<TextInput
+				label='Username'
+				placeholder='Your username'
+				value={username}
+				onChange={e => setUsername(e.currentTarget.value)}
+				required
+				mt='md'
+			/>
+			<Container className='password_input'>
 				<PasswordInput
 					label='Password'
 					placeholder='Your password'
@@ -56,11 +56,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLogin }) => {
 					required
 					mt='md'
 				/>
-				<Button type='submit' fullWidth mt='xl'>
-					Login
-				</Button>
-			</form>
-		</Container>
+			</Container>
+			<Button type='submit' fullWidth mt='xl'>
+				Login
+			</Button>
+		</form>
 	);
 };
 
