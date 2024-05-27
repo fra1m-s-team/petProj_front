@@ -51,11 +51,6 @@ body, html {
 .login_form .password_input .mantine-PasswordInput-visibilityToggle span {
   z-index: 99;
 }
-.login_form * {
-  width: 100%;
-  height: 100%;
-}
-
 #root {
   display: flex;
   justify-content: center;

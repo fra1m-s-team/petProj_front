@@ -5,6 +5,19 @@ import ReactDOM from 'react-dom/client';
 import LoginPage from './auth';
 
 
+// import {
+// 	Scene,
+// 	PerspectiveCamera,
+// 	WebGLRenderer,
+// 	BoxGeometry,
+// 	MeshBasicMaterial,
+// 	Mesh,
+// 	DirectionalLight,
+// } from 'three';
+// import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+// import { GLTFLoader } from 'three/examples/jsm/Addons.js';
+
+
 const loadStyles = async () => {
     const styles = await import('./assets/style.css');
     
@@ -18,6 +31,4 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 		<LoginPage />
 	</MantineProvider>
 );
-
-
 
