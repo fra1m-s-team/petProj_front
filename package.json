@@ -16,6 +16,10 @@
 		"@react-three/fiber": "^8.16.6",
 		"axios": "^1.7.2",
 		"mobx": "^6.12.3",
+		"cannon-es": "^0.20.0",
+		"cannon-es-debugger": "^1.0.0",
+		"cannon-utils": "^0.1.4",
+		"oimo": "^1.0.9",
 		"react": "^18.2.0",
 		"react-dom": "^18.2.0",
 		"react-router-dom": "^6.23.1",
@@ -23,8 +27,10 @@
 		"zustand": "^4.5.2"
 	},
 	"devDependencies": {
+		"@types/node": "^20.14.0",
 		"@types/react": "^18.2.66",
 		"@types/react-dom": "^18.2.22",
+		"@types/three": "^0.165.0",
 		"@typescript-eslint/eslint-plugin": "^7.2.0",
 		"@typescript-eslint/parser": "^7.2.0",
 		"@vitejs/plugin-react-swc": "^3.5.0",
