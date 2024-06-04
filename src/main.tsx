@@ -1,98 +1,81 @@
 import { MantineProvider } from '@mantine/core';
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import {
-	Scene,
-	PerspectiveCamera,
-	WebGLRenderer,
-	BoxGeometry,
-	MeshBasicMaterial,
-	Mesh,
-	DirectionalLight,
-} from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/Addons.js';
 import LoginPage from './auth';
+import { initThreeJS } from './scripts/scripts';
+import ReactDOM, { createRoot } from 'react-dom/client';
+import App from './components/app';
+import Store from './store/store';
+import { createContext, useEffect, useRef, useState } from 'react';
+interface IStore {
+	store: Store;
+}
 
-// FIXME: Вынести все в папку scripts
-// Создание сцены
-const scene = new Scene();
-const rendever = new WebGLRenderer();
-const loader = new GLTFLoader();
+const store = new Store();
 
-loader.load(
-	'src/static/models/123.glb',
-	glb => {
-		console.log('add');
-		console.log(glb);
-		const mod = glb.scene;
-		scene.add(mod);
-	},
-	progress => {
-		console.log('progress');
-		console.log(progress);
-	},
-	errr => {
-		console.log('ERR');
-		console.log(errr);
-	}
-);
+export const Context = createContext<IStore>({
+	store,
+});
 
-const light2 = new DirectionalLight(0xffffff, 2); // цвет света (красный), интенсивность
-light2.position.set(3, 0, 5); // позиция источника света
-scene.add(light2);
-
-const light = new DirectionalLight(0xffffff, 2);
-light.position.set(3, 5, 0);
-scene.add(light);
-
-const size = {
-	width: window.innerWidth,
-	heigth: window.innerHeight,
+const loadStyles = async () => {
+	const styles = await import('./assets/style.css');
 };
 
-const geometry = new BoxGeometry();
-const material = new MeshBasicMaterial({ color: 0x00ff00 });
-const cube = new Mesh(geometry, material);
-// scene.add(cube);
+loadStyles();
 
-const camera = new PerspectiveCamera(
-	50,
-	0.5 * (size.width / size.heigth),
-	1,
-	10000
-);
-camera.position.z = 1500;
+//FIXME: Нужно сделать так, чтобы если опредленные данные ввести (log: admin, pass: admin)
+//FIXME: переводил ссылку на игру Apps которая начинается с 26 строки (пока игры показывается, если в 69 строке прописать apps)
+const Apps: React.FC = () => {
+	const threeContainerRef = useRef<HTMLDivElement>(null);
 
-const controls = new OrbitControls(camera, rendever.domElement);
-controls.enableDamping = true;
+	useEffect(() => {
+		if (threeContainerRef.current) {
+			initThreeJS(threeContainerRef.current);
+		}
+	}, []);
 
-rendever.setSize(size.width, size.heigth);
-rendever.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-rendever.shadowMap.enabled = true;
-document.body.appendChild(rendever.domElement);
-
-// const theme = createTheme({
-// 	spacing: {
-// 		centered: '0 auto', // Центрирование элементов
-// 	},
-// 	// Другие свойства темы...
-// });
+	return (
+		<MantineProvider>
+			<div id='three-container' ref={threeContainerRef}></div>
+		</MantineProvider>
+	);
+};
 
 // ReactDOM.createRoot(document.getElementById('root')!).render(
 // 	<MantineProvider>
-// 		<LoginPage />
+// 		<Apps />
 // 	</MantineProvider>
 // );
 
+function AppInit() {
+	const [isReady, setIsReady] = useState(false);
 
-const animate = () => {
-	requestAnimationFrame(animate);
+	useEffect(() => {
+		// Suppose you need to delay rendering until some condition is met
+		const token = localStorage.getItem('token');
+		console.log(token);
+		if (token) {
+			store.checkAuth().finally(() => {
+				setIsReady(true); // Set to true once everything is checked
+			});
+		} else {
+			setIsReady(true); // If no token, set to ready immediately
+		}
+	}, []);
 
-	cube.rotation.x += 0.01;
-	cube.rotation.y += 0.01;
+	if (!isReady) {
+		return <div>Loading...</div>; // Or some loading component
+	}
 
-	rendever.render(scene, camera);
-};
+	return (
+		<Context.Provider value={{ store }}>
+			<App />
+		</Context.Provider>
+	);
+}
 
-animate();
+document.addEventListener('DOMContentLoaded', () => {
+	const container = document.getElementById('root');
+	if (container) {
+		const root = createRoot(container);
+		root.render(<AppInit />);
+	}
+});
