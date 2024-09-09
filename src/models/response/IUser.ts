@@ -1,6 +1,6 @@
-export interface IUser{
-    email: string;
-    isActivated: boolean;
-    id: string;
-    name: string;
+export interface IUser {
+	name: string;
+	email: string;
+	isActivated: boolean;
+	id: string;
 }

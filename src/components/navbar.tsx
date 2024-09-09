@@ -1,23 +1,56 @@
-
-import { useContext } from 'react';
-import {useNavigate} from 'react-router-dom';
+import { useContext, useState } from 'react';
 import { Context } from '../main';
-
-
+import { Button, Drawer, Burger, Group } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+import LoginPage from './auth';
+import RegisterPage from './register';
+import { useNavigate } from 'react-router-dom';
 
 const NavigationButtons = () => {
-    const navigate = useNavigate();
-    let {store} = useContext(Context);
-  
-    return (
-      <div>
-        <button onClick={() => navigate('/')}>Main Page</button>
-        <button onClick={() => navigate('/auth')}>Login</button>
-        <button onClick={() => navigate('/register')}>Register</button>
-        <button onClick={() => {store.logout()
-          navigate('/')}}>Logout</button>
-      </div>
-    );
+	const navigate = useNavigate();
+	let { store } = useContext(Context);
+	const [opened, { toggle, close }] = useDisclosure(false);
+	const [currentView, setCurrentView] = useState(''); // Для управления отображением разных компонентов
+
+	return (
+		<>
+			<Burger opened={opened} onClick={toggle} size='sm' />
+			<Drawer
+				opened={opened}
+				onClose={close}
+				padding='md'
+				size='md'
+				position='left'
+				title='Menu'
+				withCloseButton={false}
+			>
+				<Group >
+					<Button
+						onClick={() => {
+							navigate('/');
+							close();
+						}}
+					>
+						Main
+					</Button>{' '}
+					<Button onClick={() => setCurrentView('login')}>Login</Button>
+					<Button onClick={() => setCurrentView('register')}>Register</Button>
+					<Button
+						onClick={() => {
+							store.logout();
+							navigate('/');
+							close();
+						}}
+					>
+						Logout
+					</Button>
+				</Group>
+
+				{currentView === 'login' && <LoginPage />}
+				{currentView === 'register' && <RegisterPage />}
+			</Drawer>
+		</>
+	);
 };
 
 export default NavigationButtons;

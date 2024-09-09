@@ -1,5 +1,5 @@
-export interface RegResponse{
-    name: string;
-    email: string;
-    password: string;
+export interface RegResponse {
+	name: string;
+	email: string;
+	password: string;
 }

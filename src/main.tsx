@@ -1,10 +1,9 @@
-import { MantineProvider } from '@mantine/core';
-import LoginPage from './auth';
-import ReactDOM, { createRoot } from 'react-dom/client';
+import '@mantine/core/styles.css';
+import { createRoot } from 'react-dom/client';
 import App from './components/app';
 import Store from './store/store';
 import { createContext, useEffect, useState } from 'react';
-
+import { MantineProvider } from '@mantine/core';
 interface IStore {
 	store: Store;
 }
@@ -14,12 +13,6 @@ const store = new Store();
 export const Context = createContext<IStore>({
 	store,
 });
-
-const loadStyles = async () => {
-	const styles = await import('./assets/style.css');
-};
-
-loadStyles();
 
 function AppInit() {
 	const [isReady, setIsReady] = useState(false);
@@ -43,7 +36,9 @@ function AppInit() {
 
 	return (
 		<Context.Provider value={{ store }}>
-			<App />
+			<MantineProvider>
+				<App />
+			</MantineProvider>
 		</Context.Provider>
 	);
 }
