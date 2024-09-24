@@ -1,7 +1,7 @@
-import { IUser } from './IUser';
+import { ITokens } from './ITokens';
+import { IAuthUser } from './IAuthUser';
 
 export interface AuthResponse {
-	accessToken: string;
-	refreshToken: string;
-	user: IUser;
+	tokens: ITokens;
+	user: IAuthUser;
 }

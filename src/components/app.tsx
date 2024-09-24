@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { Container, Paper } from '@mantine/core';
+import { Container, Group, Paper } from '@mantine/core';
 import NavigationButtons from './navbar';
 import MainPage from './mainpage';
-import LoginPage from './auth';
-import RegisterPage from './register';
+import AuthPage from './auth';
+import RegistrationPage from './register';
+import AvatarButtons from './avatar';
+import GamePage from './game';
+import UserPage from './user';
 
 const App = () => {
 	return (
@@ -17,13 +20,18 @@ const App = () => {
 					shadow='xl'
 					style={{ marginBottom: '20px', position: 'relative' }}
 				>
-					<NavigationButtons />
+					<Group>
+						<AvatarButtons />
+						<NavigationButtons />
+					</Group>
 				</Paper>
 				<Container>
 					<Routes>
 						<Route path='/' element={<MainPage />} />
-						<Route path='/auth' element={<LoginPage />} />
-						<Route path='/register' element={<RegisterPage />} />
+						<Route path='/auth' element={<AuthPage />} />
+						<Route path='/register' element={<RegistrationPage />} />
+						<Route path='/game' element={<GamePage />} />
+						<Route path='/profile' element={<UserPage />} />
 					</Routes>
 				</Container>
 			</Router>

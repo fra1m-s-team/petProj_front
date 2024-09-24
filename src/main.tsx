@@ -18,20 +18,18 @@ function AppInit() {
 	const [isReady, setIsReady] = useState(false);
 
 	useEffect(() => {
-		// Suppose you need to delay rendering until some condition is met
 		const token = localStorage.getItem('token');
-		console.log(token);
 		if (token) {
 			store.checkAuth().finally(() => {
-				setIsReady(true); // Set to true once everything is checked
+				setIsReady(true); 
 			});
 		} else {
-			setIsReady(true); // If no token, set to ready immediately
+			setIsReady(true);
 		}
 	}, []);
 
 	if (!isReady) {
-		return <div>Loading...</div>; // Or some loading component
+		return <div>Loading...</div>;
 	}
 
 	return (

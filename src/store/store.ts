@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { IUser } from '../models/response/IUser';
+import { IAuthUser } from '../models/response/IAuthUser';
 import { makeAutoObservable } from 'mobx';
 import { AuthResponse } from '../models/response/AuthResponse';
 import { API_URL } from '../http';
-import { useNavigate } from 'react-router-dom';
 import AuthService from '../services/AuthService';
+import UpdateUserService from '../services/UpdateUserService';
 
 export default class Store {
-	user = {} as IUser;
+	user = {} as IAuthUser;
 	isAuth = false;
 
 	constructor() {
@@ -18,30 +18,33 @@ export default class Store {
 		this.isAuth = bool;
 	}
 
-	setUser(user: IUser) {
+	setUser(user: IAuthUser) {
 		this.user = user;
 	}
 
-	async login(email: string, password: string) {
+	async auth(email: string, password: string) {
 		try {
-			const response = await AuthService.login(email, password);
-			console.log(response);
-			localStorage.setItem('token', response.data.user.accessToken);
+			const response = await AuthService.auth(email, password);
+			localStorage.setItem('token', response.data.tokens.accesToken);
 			this.setAuth(true);
 			this.setUser(response.data.user);
 		} catch (err: any) {
-			console.log(err.response?.data?.messages);
+			console.log(err.response);
+			throw err;
 		}
 	}
 
-	async reg(name: string, email: string, password: string) {
+	async registration(name: string, email: string, password: string) {
 		try {
-			const response = await AuthService.register(name, email, password);
-			localStorage.setItem('token', response.data.user.accessToken);
+			const response = await AuthService.registration(name, email, password);
+			if (response.data.tokens?.accesToken) {
+				localStorage.setItem('token', response.data.tokens?.accesToken);
+			}
 			this.setAuth(true);
+			// FIXME: RegResponse не праильный???? may be
 			this.setUser(response.data.user);
 		} catch (err: any) {
-			console.log(err.response?.data?.messages);
+			throw err;
 		}
 	}
 
@@ -51,10 +54,10 @@ export default class Store {
 				await AuthService.logout();
 				localStorage.removeItem('token');
 				this.setAuth(false);
-				this.setUser({} as IUser);
+				this.setUser({} as IAuthUser);
 			}
 		} catch (err: any) {
-			//console.log(err.response?.data?.messages);
+			console.log(err.response?.data?.messages);
 		}
 	}
 
@@ -65,12 +68,39 @@ export default class Store {
 					`${API_URL}/user/refresh`,
 					{ withCredentials: true }
 				);
-				//localStorage.setItem('token', response.data.user.accessToken);
+				localStorage.setItem('token', response.data.tokens.accesToken);
 				this.setAuth(true);
 				this.setUser(response.data.user);
 			}
 		} catch (err: any) {
 			this.setAuth(false);
 		}
+	}
+
+	async updateUser(
+		email: string,
+		newPassword: string,
+		password: string,
+		code: number
+	) {
+		try {
+			if (localStorage.getItem('token')) {
+				const response = await UpdateUserService.updateUser(
+					email,
+					newPassword,
+					password,
+					code
+				);
+				await this.logout();
+			}
+		} catch (err: any) {
+			throw err;
+		}
+	}
+
+	async sendCode() {
+		try {
+			await UpdateUserService.sendCode();
+		} catch (error) {}
 	}
 }

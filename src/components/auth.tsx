@@ -1,3 +1,7 @@
+//FIXME: [Error] Cannot use wildcard in Access-Control-Allow-Origin when credentials flag is true.
+//FIXME: [Error] XMLHttpRequest cannot load http://localhost:5173/auth due to access control checks.
+//FIXME: [Error] Failed to load resource: Cannot use wildcard in Access-Control-Allow-Origin when credentials flag is true. (auth, line 0)
+
 import React, { useContext, useState } from 'react';
 import { Context } from '../main';
 import { useNavigate } from 'react-router-dom';
@@ -8,21 +12,49 @@ import {
 	Title,
 	PasswordInput,
 	Alert,
-} from '@mantine/core'; // Импорт компонентов Mantine
+} from '@mantine/core';
 
-const LoginPage = () => {
+const AuthPage = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
+	const [errors, setErrors] = useState<{
+		email?: string;
+		password?: string;
+	}>({});
 	const navigate = useNavigate();
-	let { store } = useContext(Context);
+	const { store } = useContext(Context);
 
-	const handleLogin = (e: React.FormEvent) => {
+	const handleLogin = async (e: React.FormEvent) => {
 		e.preventDefault();
-		store.login(email, password);
-		navigate('/');
+		setErrors({});
+		setErrorMessage(''); 
+
+		try {
+			await store.auth(email, password);
+			navigate('/');
+		} catch (err: any) {
+			const serverErrors = err.response?.data || [];
+			const fieldErrors: { email?: string; password?: string } = {};
+
+			if (Array.isArray(serverErrors)) {
+				serverErrors.forEach((error: any) => {
+					if (error.includes('email')) {
+						fieldErrors.email = error.split('-')[1]?.trim();
+					} else if (error.includes('password')) {
+						fieldErrors.password = error.split('-')[1]?.trim();
+					}
+				});
+
+				setErrors(fieldErrors);
+			}
+
+			setErrorMessage(err.response?.data?.message || 'Неизвестная ошибка'); // Устанавливаем сообщение об ошибке
+		}
 	};
 
-	store.checkAuth();
+  //FIXME: При вводе на каждый симвл ошибка 401
+	// store.checkAuth();
 
 	if (localStorage.getItem('token') && store.isAuth) {
 		return (
@@ -38,6 +70,12 @@ const LoginPage = () => {
 		<Container size={420} my={40}>
 			<Title order={1}>Войти</Title>
 
+			{errorMessage && (
+				<Alert color='red' mb='md'>
+					{errorMessage}
+				</Alert>
+			)}
+
 			<form onSubmit={handleLogin}>
 				<TextInput
 					label='Email'
@@ -46,6 +84,7 @@ const LoginPage = () => {
 					value={email}
 					onChange={e => setEmail(e.currentTarget.value)}
 					mb='md'
+					error={errors.email}
 				/>
 
 				<PasswordInput
@@ -55,6 +94,7 @@ const LoginPage = () => {
 					value={password}
 					onChange={e => setPassword(e.currentTarget.value)}
 					mb='md'
+					error={errors.password}
 				/>
 
 				<Button fullWidth type='submit' mt='md'>
@@ -65,4 +105,4 @@ const LoginPage = () => {
 	);
 };
 
-export default LoginPage;
+export default AuthPage;
