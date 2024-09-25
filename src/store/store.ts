@@ -91,7 +91,9 @@ export default class Store {
 					password,
 					code
 				);
-				await this.logout();
+				if (response && response.status === 200) {
+					window.location.href = '/auth'; // Редирект на страницу авторизации
+				}
 			}
 		} catch (err: any) {
 			throw err;
@@ -101,6 +103,8 @@ export default class Store {
 	async sendCode() {
 		try {
 			await UpdateUserService.sendCode();
-		} catch (error) {}
+		} catch (err: any) {
+			throw err
+		}
 	}
 }

@@ -88,7 +88,7 @@ const UpdateUserPage = () => {
 
 	return (
 		<Container size={420} my={40}>
-			<Title order={1}>Сброс пароля</Title>
+			<Title order={1}>Смена пароля</Title>
 			{errorMessage && (
 				<Alert color='red' mb='md'>
 					{errorMessage}

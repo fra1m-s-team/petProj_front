@@ -8,6 +8,7 @@ import {
 	Button,
 	Title,
 	Text,
+	Alert,
 } from '@mantine/core';
 
 const RegistrationPage = () => {
@@ -15,6 +16,7 @@ const RegistrationPage = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [confirmPassword, setConfirmPassword] = useState('');
+	const [errorMessage, setErrorMessage] = useState('');
 	const [errors, setErrors] = useState<{
 		email?: string;
 		password?: string;
@@ -26,6 +28,7 @@ const RegistrationPage = () => {
 	const handleRegister = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setErrors({});
+		setErrorMessage('');
 
 		// Проверяем, совпадают ли пароли
 		if (password !== confirmPassword) {
@@ -40,15 +43,18 @@ const RegistrationPage = () => {
 			const fieldErrors: { email?: string; password?: string } = {};
 
 			// Обрабатываем ошибки с сервера и добавляем их к соответствующим полям
-			serverErrors.forEach((error: string) => {
-				if (error.includes('email')) {
-					fieldErrors.email = error.split('-')[1];
-				} else if (error.includes('password')) {
-					fieldErrors.password = error.split('-')[1]; // Ошибка password
-				}
-			});
+			if (Array.isArray(serverErrors)) {
+				serverErrors.forEach((error: string) => {
+					if (error.includes('email')) {
+						fieldErrors.email = error.split('-')[1];
+					} else if (error.includes('password')) {
+						fieldErrors.password = error.split('-')[1]; // Ошибка password
+					}
+				});
 
-			setErrors(fieldErrors);
+				setErrors(fieldErrors);
+			}
+			setErrorMessage(err.response?.data?.message || 'Неизвестная ошибка'); // Устанавливаем сообщение об ошибке
 		}
 	};
 
@@ -64,6 +70,16 @@ const RegistrationPage = () => {
 	return (
 		<Container size={420} my={40}>
 			<Title order={1}>Регистрация</Title>
+			{errorMessage && (
+				<Alert color='red' mb='md'>
+					{errorMessage}
+				</Alert>
+			)}
+			{/* {successMessage && (
+				<Alert color='green' mb='md'>
+					{successMessage}
+				</Alert>
+			)} */}
 
 			<form onSubmit={handleRegister}>
 				<TextInput
