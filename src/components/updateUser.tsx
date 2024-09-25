@@ -6,9 +6,16 @@ import {
 	Title,
 	Alert,
 	Group,
+	PasswordInput,
+	Popover,
+	Progress,
 } from '@mantine/core';
 import { Context } from '../main';
-import { error } from 'console';
+import {
+	requirements,
+	getStrength,
+	PasswordRequirement,
+} from '../utils/PasswordUtils';
 
 const UpdateUserPage = () => {
 	const [email, setEmail] = useState('');
@@ -26,20 +33,24 @@ const UpdateUserPage = () => {
 		confirmNewPassword?: string;
 		code?: string;
 	}>({});
+	const [popoverOpened, setPopoverOpened] = useState(false);
 
 	const updateUser = async (e: React.FormEvent) => {
 		e.preventDefault();
 		setErrors({});
 		setErrorMessage('');
+		setSuccessMessage('');
 
 		if (newPassword !== confirmNewPassword) {
 			setErrors({ confirmNewPassword: 'Пароли не совпадают' });
 			return;
 		}
+
 		try {
 			await store.updateUser(email, newPassword, oldPassword, Number(code));
+			setSuccessMessage('Пароль успешно обновлен!');
 		} catch (err: any) {
-			const serverErrors = err.response?.data || [];
+			const serverErrors = err.response?.data?.errors || [];
 			const fieldErrors: {
 				email?: string;
 				newPassword?: string;
@@ -47,13 +58,11 @@ const UpdateUserPage = () => {
 				code?: string;
 			} = {};
 
-			// Обрабатываем ошибки с сервера и добавляем их к соответствующим полям
 			if (Array.isArray(serverErrors)) {
-				serverErrors.forEach((error: string) => {
-					const errorKey = error.split('-')[0].trim();
-					const errorMessage = error.split('-')[1].trim();
-					console.log(errorMessage);
-
+				serverErrors.forEach((error: any) => {
+					const [errorKey, errorMessage] = error
+						.split('-')
+						.map((e: string) => e.trim());
 					switch (errorKey) {
 						case 'email':
 							fieldErrors.email = errorMessage;
@@ -61,23 +70,35 @@ const UpdateUserPage = () => {
 						case 'password':
 							fieldErrors.newPassword = errorMessage;
 							break;
+						case 'oldPassword':
+							fieldErrors.oldPassword = errorMessage;
+							break;
 						case 'code':
 							fieldErrors.code = errorMessage;
 							break;
 						default:
-							// Обработка неизвестных ошибок, если необходимо
 							break;
 					}
 				});
 				setErrors(fieldErrors);
+			} else {
+				setErrorMessage(err.response?.data?.message || 'Неизвестная ошибка');
 			}
-			setErrorMessage(err.response?.data?.message || 'Неизвестная ошибка'); // Устанавливаем сообщение об ошибке
 		}
 	};
+	const strength = getStrength(newPassword);
+	const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red';
+	const checks = requirements.map((requirement: any, index: any) => (
+		<PasswordRequirement
+			key={index}
+			label={requirement.label}
+			meets={requirement.re.test(newPassword)}
+		/>
+	));
 
 	const handleSendCode = async () => {
 		try {
-			await store.sendCode();
+			await store.sendCode(email);
 			setSuccessMessage('Код успешно отправлен на вашу почту!');
 		} catch (err: any) {
 			setErrorMessage(
@@ -111,7 +132,7 @@ const UpdateUserPage = () => {
 					error={errors.email}
 				/>
 
-				<TextInput
+				<PasswordInput
 					label='Старый пароль'
 					placeholder='Ваш старый пароль'
 					required
@@ -120,18 +141,40 @@ const UpdateUserPage = () => {
 					mb='md'
 					error={errors.oldPassword}
 				/>
+        
+				<Popover
+					opened={popoverOpened}
+					position='bottom'
+					width='target'
+					transitionProps={{ transition: 'pop' }}
+				>
+					<Popover.Target>
+						<div
+							onFocusCapture={() => setPopoverOpened(true)}
+							onBlurCapture={() => setPopoverOpened(false)}
+						>
+							<PasswordInput
+								label='Новый пароль'
+								placeholder='Ваш новый пароль'
+								required
+								value={newPassword}
+								onChange={e => setNewPassword(e.currentTarget.value)}
+								mb='md'
+								error={errors.newPassword}
+							/>
+						</div>
+					</Popover.Target>
+					<Popover.Dropdown>
+						<Progress color={color} value={strength} size={5} mb='xs' />
+						<PasswordRequirement
+							label='Содержит как минимум 6 символов'
+							meets={newPassword.length > 5}
+						/>
+						{checks}
+					</Popover.Dropdown>
+				</Popover>
 
-				<TextInput
-					label='Новый пароль'
-					placeholder='Ваш новый пароль'
-					required
-					value={newPassword}
-					onChange={e => setNewPassword(e.currentTarget.value)}
-					mb='md'
-					error={errors.newPassword}
-				/>
-
-				<TextInput
+				<PasswordInput
 					label='Подтвердите новый пароль'
 					placeholder='Подтвердите ваш новый пароль'
 					required

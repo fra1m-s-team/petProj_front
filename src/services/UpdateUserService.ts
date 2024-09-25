@@ -16,7 +16,15 @@ export default class UpdateUserService {
 		});
 	}
 
-	static async sendCode() {
-		return $api.post('/user/send-code');
+	static async sendCode(email: string) {
+		return $api.post('/user/send-code', { email });
+	}
+
+	static async resetPassword(email: string, newPassword: string, code: number) {
+		return $api.patch('/user/reset', {
+			email,
+			newPassword,
+			code,
+		});
 	}
 }

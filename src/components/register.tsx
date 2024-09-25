@@ -9,7 +9,14 @@ import {
 	Title,
 	Text,
 	Alert,
+	Progress,
+	Popover,
 } from '@mantine/core';
+import {
+	requirements,
+	getStrength,
+	PasswordRequirement,
+} from '../utils/PasswordUtils';
 
 const RegistrationPage = () => {
 	const [username, setUsername] = useState('');
@@ -22,6 +29,7 @@ const RegistrationPage = () => {
 		password?: string;
 		confirmPassword?: string;
 	}>({});
+	const [popoverOpened, setPopoverOpened] = useState(false);
 	const { store } = useContext(Context);
 	const navigate = useNavigate();
 
@@ -30,9 +38,9 @@ const RegistrationPage = () => {
 		setErrors({});
 		setErrorMessage('');
 
-		// Проверяем, совпадают ли пароли
 		if (password !== confirmPassword) {
 			setErrors({ confirmPassword: 'Пароли не совпадают' });
+			return;
 		}
 
 		try {
@@ -42,7 +50,6 @@ const RegistrationPage = () => {
 			const serverErrors = err.response?.data || [];
 			const fieldErrors: { email?: string; password?: string } = {};
 
-			// Обрабатываем ошибки с сервера и добавляем их к соответствующим полям
 			if (Array.isArray(serverErrors)) {
 				serverErrors.forEach((error: string) => {
 					if (error.includes('email')) {
@@ -54,7 +61,7 @@ const RegistrationPage = () => {
 
 				setErrors(fieldErrors);
 			}
-			setErrorMessage(err.response?.data?.message || 'Неизвестная ошибка'); // Устанавливаем сообщение об ошибке
+			setErrorMessage(err.response?.data?.message || 'Неизвестная ошибка');
 		}
 	};
 
@@ -67,6 +74,16 @@ const RegistrationPage = () => {
 		);
 	}
 
+	const strength = getStrength(password);
+	const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red';
+	const checks = requirements.map((requirement: any, index: any) => (
+		<PasswordRequirement
+			key={index}
+			label={requirement.label}
+			meets={requirement.re.test(password)}
+		/>
+	));
+
 	return (
 		<Container size={420} my={40}>
 			<Title order={1}>Регистрация</Title>
@@ -75,11 +92,6 @@ const RegistrationPage = () => {
 					{errorMessage}
 				</Alert>
 			)}
-			{/* {successMessage && (
-				<Alert color='green' mb='md'>
-					{successMessage}
-				</Alert>
-			)} */}
 
 			<form onSubmit={handleRegister}>
 				<TextInput
@@ -98,18 +110,40 @@ const RegistrationPage = () => {
 					onChange={e => setEmail(e.currentTarget.value)}
 					required
 					mt='md'
-					error={errors.email} // Выводим ошибку под полем email
+					error={errors.email}
 				/>
 
-				<PasswordInput
-					label='Пароль'
-					placeholder='Введите пароль'
-					value={password}
-					onChange={e => setPassword(e.currentTarget.value)}
-					required
-					mt='md'
-					error={errors.password} // Выводим ошибку под полем password
-				/>
+				<Popover
+					opened={popoverOpened}
+					position='bottom'
+					width='target'
+					transitionProps={{ transition: 'pop' }}
+				>
+					<Popover.Target>
+						<div
+							onFocusCapture={() => setPopoverOpened(true)}
+							onBlurCapture={() => setPopoverOpened(false)}
+						>
+							<PasswordInput
+								label='Пароль'
+								placeholder='Введите пароль'
+								value={password}
+								onChange={e => setPassword(e.currentTarget.value)}
+								required
+								mt='md'
+								error={errors.password}
+							/>
+						</div>
+					</Popover.Target>
+					<Popover.Dropdown>
+						<Progress color={color} value={strength} size={5} mb='xs' />
+						<PasswordRequirement
+							label='Содержит как минимум 6 символов'
+							meets={password.length > 5}
+						/>
+						{checks}
+					</Popover.Dropdown>
+				</Popover>
 
 				<PasswordInput
 					label='Подтвердите пароль'
@@ -118,7 +152,7 @@ const RegistrationPage = () => {
 					onChange={e => setConfirmPassword(e.currentTarget.value)}
 					required
 					mt='md'
-					error={errors.confirmPassword} // Выводим ошибку под полем confirmPassword
+					error={errors.confirmPassword}
 				/>
 
 				<Button fullWidth mt='xl' type='submit'>

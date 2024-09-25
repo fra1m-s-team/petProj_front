@@ -100,11 +100,26 @@ export default class Store {
 		}
 	}
 
-	async sendCode() {
+	async sendCode(email: string) {
 		try {
-			await UpdateUserService.sendCode();
+			await UpdateUserService.sendCode(email);
 		} catch (err: any) {
-			throw err
+			throw err;
+		}
+	}
+
+	async resetPassword(email: string, newPassword: string, code: number) {
+		try {
+			const response = await UpdateUserService.resetPassword(
+				email,
+				newPassword,
+				code
+			);
+			if (response && response.status === 200) {
+				window.location.href = '/auth'; // Редирект на страницу авторизации
+			}
+		} catch (err: any) {
+			throw err;
 		}
 	}
 }
