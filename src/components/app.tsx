@@ -3,8 +3,10 @@ import { Container, Group, Paper } from '@mantine/core';
 import NavigationButtons from './navbar';
 import MainPage from './mainpage';
 import AvatarButtons from './avatar';
-import GamePage from './game';
+import ConstructorPage from './game';
 import UserPage from './user';
+import { createScene } from './scenePage'; // Импортируйте функцию createScene
+
 
 const App = () => {
 	return (
@@ -26,7 +28,7 @@ const App = () => {
 				<Container>
 					<Routes>
 						<Route path='/' element={<MainPage />} />
-						<Route path='/game' element={<GamePage />} />
+						<Route path='/game' element={<ConstructorPage />} />
 						<Route path='/profile' element={<UserPage />} />
 					</Routes>
 				</Container>
