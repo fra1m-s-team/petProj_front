@@ -34,7 +34,7 @@ const NavigationButtons = () => {
 					</Button>{' '}
 					<Button
 						onClick={() => {
-							navigate('/game'); // Перенаправление на страницу игры
+							navigate('/game');
 							close();
 						}}
 					>

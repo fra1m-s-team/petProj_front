@@ -5,8 +5,7 @@ import MainPage from './mainpage';
 import AvatarButtons from './avatar';
 import ConstructorPage from './game';
 import UserPage from './user';
-import { createScene } from './scenePage'; // Импортируйте функцию createScene
-
+import { createScene } from '../services/scene/scene'; // Импортируйте функцию createScene
 
 const App = () => {
 	return (

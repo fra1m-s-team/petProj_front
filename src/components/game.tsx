@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Container, Title, Space, Box, Button, Group } from '@mantine/core';
-import { createScene } from './scenePage'; // Импортируем функцию createScene
+import { createScene } from '../services/scene/scene';
 import Store from '../store/store';
 
 const ConstructorPage = () => {
@@ -30,7 +30,7 @@ const ConstructorPage = () => {
 			canvas.requestFullscreen();
 		}
 	};
-  //FIXME: Добавить проверку на авторизацию
+	//FIXME: Добавить проверку на авторизацию
 
 	return (
 		<Container>
