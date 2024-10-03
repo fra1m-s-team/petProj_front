@@ -58,15 +58,22 @@ export const createGUI = (
 			shapes.forEach(shape => {
 				if (shape.physicsImpostor) {
 					if (value) {
-						// Включаем физику, если она отключена
 						shape.physicsImpostor.wakeUp();
 					} else {
-						// Отключаем физику
 						shape.physicsImpostor.sleep();
 					}
 				}
 			});
 		});
+
+	// Обработчик клавиатуры для отмены последнего действия
+	const handleKeyDown = (event: KeyboardEvent) => {
+		if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
+			event.preventDefault(); // Предотвращаем стандартное поведение
+			undoLastShape(); // Вызываем функцию отмены
+		}
+	};
+	document.addEventListener('keydown', handleKeyDown);
 
 	return { options, gui };
 };
