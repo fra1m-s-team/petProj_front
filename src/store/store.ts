@@ -5,6 +5,7 @@ import { AuthResponse } from '../models/response/AuthResponse';
 import { API_URL } from '../http';
 import AuthService from '../services/AuthService';
 import UpdateUserService from '../services/UpdateUserService';
+import SceneService from '../services/scene/SceneService';
 
 export default class Store {
 	user = {} as IAuthUser;
@@ -119,6 +120,20 @@ export default class Store {
 				window.location.href = '/auth'; // Редирект на страницу авторизации
 			}
 		} catch (err: any) {
+			throw err;
+		}
+	}
+	async saveSceneToDB(sceneJSON: string, user: any) {
+		try {
+			if (localStorage.getItem('token')) {
+				const response = await SceneService.save(sceneJSON, user)
+
+				console.log('Сцена успешно сохранена:', response.data);
+			} else {
+				console.log('Токен не найден, пользователь не авторизован');
+			}
+		} catch (err: any) {
+			console.error('Ошибка при сохранении сцены:', err);
 			throw err;
 		}
 	}

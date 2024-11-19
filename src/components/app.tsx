@@ -3,7 +3,7 @@ import { Container, Group, Paper } from '@mantine/core';
 import NavigationButtons from './navbar';
 import MainPage from './mainpage';
 import AvatarButtons from './avatar';
-import ConstructorPage from './game';
+import ConstructorPage from './consturctor';
 import UserPage from './user';
 import { createScene } from '../services/scene/scene'; // Импортируйте функцию createScene
 

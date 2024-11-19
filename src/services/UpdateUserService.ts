@@ -16,6 +16,7 @@ export default class UpdateUserService {
 		});
 	}
 
+	//FIXME: Add response 
 	static async sendCode(email: string) {
 		return $api.post('/user/send-code', { email });
 	}

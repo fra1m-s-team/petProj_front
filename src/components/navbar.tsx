@@ -3,7 +3,7 @@ import { Context } from '../main';
 import { Button, Drawer, Burger, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import { useNavigate } from 'react-router-dom';
-import GamePage from './game';
+import ConstructorPage from './consturctor';
 
 const NavigationButtons = () => {
 	const navigate = useNavigate();
@@ -42,7 +42,7 @@ const NavigationButtons = () => {
 					</Button>{' '}
 				</Group>
 
-				{currentView === 'game' && <GamePage />}
+				{currentView === 'game' && <ConstructorPage />}
 			</Drawer>
 		</>
 	);

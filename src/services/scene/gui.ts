@@ -3,9 +3,8 @@ import * as dat from 'dat.gui';
 
 export const createGUI = (
 	canvas: HTMLCanvasElement,
-	// ground: BABYLON.Mesh,
-	// scene: BABYLON.Scene,
-	shapes: BABYLON.Mesh[]
+	shapes: BABYLON.Mesh[],
+	updateGridSize: (width: number, height: number) => void
 ) => {
 	const gui = new dat.GUI({ autoPlace: false });
 	const guiContainer = document.createElement('div');
@@ -23,7 +22,7 @@ export const createGUI = (
 		rotateX: () => {},
 		rotateY: () => {},
 		collisions: true,
-		physicsEnabled: true, // Добавляем опцию для управления физикой
+		physicsEnabled: true,
 	};
 
 	gui
@@ -31,20 +30,34 @@ export const createGUI = (
 		.onChange(value => {
 			options.shape = value;
 		});
-	gui.add(options, 'size', 0.1, 5);
+	// gui.add(options, 'size', 0.1, 5);
 	gui.addColor(options, 'color');
+
+	const gridOptions = {
+		width: 10,
+		height: 10,
+	};
+
+	gui
+		.add(gridOptions, 'width', 10, 1000, 2)
+		.name('Размер сетки')
+		.onChange(value => {
+			gridOptions.width = value;
+			gridOptions.height = value;
+			updateGridSize(gridOptions.width, gridOptions.height);
+		});
 
 	const clearAllShapes = () => {
 		shapes.forEach(shape => {
-			shape.dispose(); // Удаляем фигуру из сцены
+			shape.dispose();
 		});
-		shapes.length = 0; // Очищаем массив фигур
+		shapes.length = 0;
 	};
 
 	const undoLastShape = () => {
 		if (shapes.length > 0) {
-			const lastShape = shapes.pop(); // Убираем последнюю фигуру из массива
-			lastShape?.dispose(); // Удаляем фигуру из сцены
+			const lastShape = shapes.pop();
+			lastShape?.dispose();
 		}
 	};
 
@@ -66,11 +79,10 @@ export const createGUI = (
 			});
 		});
 
-	// Обработчик клавиатуры для отмены последнего действия
 	const handleKeyDown = (event: KeyboardEvent) => {
 		if ((event.ctrlKey || event.metaKey) && event.key === 'z') {
-			event.preventDefault(); // Предотвращаем стандартное поведение
-			undoLastShape(); // Вызываем функцию отмены
+			event.preventDefault();
+			undoLastShape();
 		}
 	};
 	document.addEventListener('keydown', handleKeyDown);
